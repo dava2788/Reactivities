@@ -13,7 +13,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Persistence;
-
+using MediatR;
+using Application.Activities;
+using Application.Core;
+using AutoMapper;
+using API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,23 +25,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddSwaggerGen(c=>{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
+//This call is for use the AddApplicationServices class
+//to set up the services we want to use
+builder.Services.AddApplicationServices(builder.Configuration);
 
-});
-
-
-builder.Services.AddDbContext<DataContext>(opt=>{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-builder.Services.AddCors(opt=>{
-    opt.AddPolicy("CorsPolicy",policy=>{
-        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
-        //policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
-    });
-
-});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 // builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
