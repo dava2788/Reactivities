@@ -1,15 +1,13 @@
+import { observer } from 'mobx-react-lite';
 import React, { useState,ChangeEvent } from 'react';
 import { Button, Form, Segment } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
+import { useStore } from '../../../app/stores/store';
 
-interface Props{
-    activity:Activity | undefined;
-    closeForm:()=> void;
-    createOrEdit:(activity:Activity)=>void;
-    submitting:boolean;
-}//end interface Props
 
-export default function ActivityForm({activity:selectedActivity,closeForm,createOrEdit,submitting}:Props){
+export default observer(function ActivityForm(){
+    const {activityStore}= useStore();
+    const{selectedActivity,closeForm,createActivity,updateActivity,loading}=activityStore;
+
     const initialState= selectedActivity ?? {
         id: '',
         title: '',
@@ -22,8 +20,8 @@ export default function ActivityForm({activity:selectedActivity,closeForm,create
     const [activity, SetActivity]=useState(initialState);
 
     function handleSubmit(){
-        //console.log(activity);
-        createOrEdit(activity);
+        activity.id ? updateActivity(activity) : createActivity(activity);
+
     }//end handleSubmit
 
     function handleInputChange(event:ChangeEvent<HTMLInputElement | HTMLTextAreaElement>  ){
@@ -44,7 +42,7 @@ export default function ActivityForm({activity:selectedActivity,closeForm,create
                 <Form.Input type='date' placeholder='Date' name='date' value={activity.date} onChange={handleInputChange}/>
                 <Form.Input placeholder='City' name='city' value={activity.city} onChange={handleInputChange}/>
                 <Form.Input placeholder='Venue' name='venue' value={activity.venue} onChange={handleInputChange}/>
-                <Button floated="right" positive type="submit" content="Submit" loading={submitting}/>
+                <Button floated="right" positive type="submit" content="Submit" loading={loading}/>
                 <Button floated="right" type="button" content="Cancel" onClick={closeForm}/>
 
             </Form>
@@ -52,3 +50,4 @@ export default function ActivityForm({activity:selectedActivity,closeForm,create
     );//end return
 
 }//end ActivityForm
+)
