@@ -1,7 +1,6 @@
 import {makeAutoObservable, runInAction} from "mobx"
 import agent from "../api/agent";
 import { Activity } from "../models/activity"
-import {v4 as uuid} from 'uuid';
 
 export default class ActivityStore{
     activityRegister=new Map<string,Activity>();
@@ -30,6 +29,7 @@ export default class ActivityStore{
     }//end activitiesByDate
 
     loadActitivies = async ()=>{
+        this.setLoadingInitial(true);
         //syncronize code will be outside the 
         //try/catch bloack
         //this.setLoadingInitial(true);
@@ -40,11 +40,9 @@ export default class ActivityStore{
             //wait until we have something in the activities []
             //before continue with the next line
             const activities= await agent.Activities.list();
-            //this is for the 
-            
+             
             activities.forEach(activity=>{
-                activity.date=activity.date.split('T')[0];
-                this.activityRegister.set(activity.id,activity);
+                this.setActivity(activity);
                 }
             );//end Forach
 
@@ -57,31 +55,47 @@ export default class ActivityStore{
         }//end catch
     }//end loadAcitivies
 
+    loadActitivy=async(id:string)=>{
+        let activity=this.getActivity(id);
+        if(activity){
+            this.selectedActivity=activity;
+            return activity;
+        }//end if(activity)
+        else{
+            this.loadingInitial=true;
+            try {
+                activity=await agent.Activities.details(id);
+                this.setActivity(activity);
+                runInAction(()=>{
+                    this.selectedActivity=activity;
+                })//end runInAction
+                
+                this.setLoadingInitial(false);
+                return activity;
+             }//end try
+            catch (error) {
+                console.log(error);
+                this.setLoadingInitial(false);
+            }//end catch
+
+        }//end ELSE if(activity)
+    }//end loadActitivy
+
+    private setActivity=(activity:Activity)=>{
+        activity.date=activity.date.split('T')[0];
+        this.activityRegister.set(activity.id,activity);
+    }//end setActivity
+
+    private getActivity=(id:string)=>{
+        return this.activityRegister.get(id);
+    }//end getActivity
+
     setLoadingInitial=(state:boolean)=>{
         this.loadingInitial=state;
     }//end setLoadingInitial
 
-    selectActivity=(id:string)=>{
-        this.selectedActivity=this.activityRegister.get(id);
-    }//end selectActivity
-
-    cancelselectedActivity=()=>{
-        this.selectedActivity=undefined;
-    }//end cancelselectActivity
-
-    //? mark is for optional
-    openForm=(id ?: string) => {
-        id? this.selectActivity(id): this.cancelselectedActivity();
-        this.editMode=true;
-    }//end openForm
-   
-    closeForm=()=>{
-        this.editMode=false;
-    }//end closeForm
-
     createActivity=async(activity:Activity)=>{
         this.loading=true;
-        activity.id=uuid();
         try {
             await agent.Activities.create(activity);
             runInAction(()=>{
@@ -125,7 +139,6 @@ export default class ActivityStore{
             await agent.Activities.delete(id);
             runInAction(()=>{
                 this.activityRegister.delete(id);
-                if(this.selectedActivity?.id===id) {this.cancelselectedActivity();}
                 this.loading=false;
             });//end runInAction
         }//end try

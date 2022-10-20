@@ -1,38 +1,32 @@
-import React, {  useEffect } from 'react';
-import {  Container } from 'semantic-ui-react';
+import React from 'react';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
-import LoadingComponent from './LoadingComponents';
-import { useStore } from '../stores/store';
 import { observer } from 'mobx-react-lite';
-import NavigBar from './NavigBar';
-//this an error because the packagae doesn't have a Typescript definition
-
-
-
+import { Route, Routes, useLocation } from 'react-router-dom';
+import ActivityForm from '../../features/activities/form/ActivityForm';
+import HomePage from '../../features/home/HomePage';
+import ActivityDetails from '../../features/activities/details/ActivityDetails';
+import Layout from './Layout';
 
 function App() {
-  const {activityStore}= useStore();
-
-  useEffect(()=>{
-    activityStore.loadActitivies();
-  },[activityStore]);
-
-
-if(activityStore.loadingInitial) {
-  return <LoadingComponent content='loading App'></LoadingComponent>
-}//end if(loading)
-else{
-  return (
-    <>
-      <NavigBar></NavigBar>
-      <Container style={{marginTop:'7em'}}>
-        <ActivityDashboard/>
-      </Container>
-    </>
-  );
-}//end else
-
+  const location=useLocation();
   
+    return (
+      <>
+        <Routes>
+          <Route path='/' element={<HomePage/>} /> 
+          <Route path='' element={<Layout/>}>
+            <Route path='/activities'  element={<ActivityDashboard/>}/>
+            <Route path='/activities/:id' element={<ActivityDetails/>}/>
+            {["/createActivity", "/manage/:id"].map((path) => {
+              return (
+                <Route key={location.key} path={path} element={<ActivityForm key={location.key} />} />
+              );
+            })}
+          </Route> 
+        </Routes>
+      </>
+    );
+
 }//end function App
 
 //this is for Mobx

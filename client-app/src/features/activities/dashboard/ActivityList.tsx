@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { SyntheticEvent, useState } from "react";
+import { Link } from 'react-router-dom';
 import { Button, Item, Label, Segment } from "semantic-ui-react";
 import { useStore } from "../../../app/stores/store";
 
@@ -31,9 +32,7 @@ export default observer( function ActivityList(){
                             <Item.Extra>
                                  {/* When the button is render (without the array function) will execute as soon it's render
                                  that is why we use the array funcion, to wait the button is click for execute */}
-                                <Button floated="right" content='View' color="blue"
-                                    onClick={()=>activityStore.selectActivity(activity.id)}
-                                />
+                                <Button floated="right" content='View' color="blue" as={Link} to={`/activities/${activity.id}`}/>
                                 <Button floated="right" content='Delete' color="red"
                                     onClick={(e)=>handleActivityDelete(e,activity.id)} 
                                     loading={loading && target ===activity.id} 
