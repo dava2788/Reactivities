@@ -18,12 +18,18 @@ using Application.Activities;
 using Application.Core;
 using AutoMapper;
 using API.Extensions;
+using FluentValidation.AspNetCore;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddFluentValidation(Config=>
+{
+    Config.RegisterValidatorsFromAssemblyContaining<Create>();
+
+});
 
 //This call is for use the AddApplicationServices class
 //to set up the services we want to use
@@ -35,10 +41,11 @@ builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//This is for get our own exception (Error) middleware
+app.UseMiddleware<ExceptionMiddleware>();// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
+{  
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Core;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +13,8 @@ namespace Application.Activities
 {
     public class List
     {
-        public class Query:IRequest<List<Activity>>{}//end class Query
-        public class Handler : IRequestHandler<Query, List<Activity>>
+        public class Query:IRequest<Result<List<Activity>>>{}//end class Query
+        public class Handler : IRequestHandler<Query, Result<List<Activity>>>
         {
         public DataContext _context { get; }
 
@@ -32,7 +33,7 @@ namespace Application.Activities
                 _context = context;
             }//end constructor Handler
 
-            public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<List<Activity>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 #region Code for using the CancellationToken EXAMPLE
                 //Code for using the CancellationToken
@@ -51,7 +52,7 @@ namespace Application.Activities
                 // return await _context.Activities.ToListAsync(cancellationToken);
                 #endregion
 
-                return await _context.Activities.ToListAsync();
+                return  Result<List<Activity>>.Success(await _context.Activities.ToListAsync());
 
 
             }//end Task

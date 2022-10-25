@@ -15,6 +15,7 @@ export default observer(function NavigBar(){
                     Reactivities
                 </Menu.Item>
                 <Menu.Item as={NavLink} to='/activities' name="Activities" exact="true" />
+                <Menu.Item as={NavLink} to='/errors' name="Errors" exact="true" />
                 <Menu.Item>
                     <Button positive content='Create Activity' as={NavLink} to='/createActivity' exact="true" ></Button>
                 </Menu.Item>
