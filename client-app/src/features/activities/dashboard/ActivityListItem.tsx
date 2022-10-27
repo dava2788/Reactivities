@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Icon, Item,  Segment } from 'semantic-ui-react';
@@ -30,7 +31,8 @@ export default function ActivityListItem({activity}:Props) {
             </Segment>
             <Segment>
                 <span>
-                    <Icon name ='clock'/> {activity.date}
+                    {/* This is a problem because for show the date we need a string not a Date Type */}
+                    <Icon name ='clock'/> {format(activity.date!,'dd MMM yyyy h:mm aa')}
                     <Icon name='marker'/>{activity.venue}
                 </span>
             </Segment>

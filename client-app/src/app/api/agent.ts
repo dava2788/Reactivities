@@ -26,7 +26,7 @@ axios.interceptors.response.use(async response=>{
             }//END if (typeof data=='string')
 
 
-            if (config.method=='get' && data.errors.hasOwnProperty('id')) {
+            if (config.method==='get' && data.errors.hasOwnProperty('id')) {
                 AppHistory.push("/NotFound");
             }//end if (config.method=='get' && data.errors.hasOwnProperty('id')) 
 

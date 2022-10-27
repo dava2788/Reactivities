@@ -8,7 +8,7 @@ import 'react-calendar/dist/Calendar.css'
 import 'react-toastify/dist/ReactToastify.min.css';
 import {unstable_HistoryRouter as HistoryRouter} from 'react-router-dom';
 import { createBrowserHistory } from 'history';
-
+import 'react-datepicker/dist/react-datepicker.min.css';
 
 export const AppHistory = createBrowserHistory();
 
