@@ -29,7 +29,6 @@ namespace Persistence
             }//end if(userManager.Users.Any()){
 
 
-
             if (context.Activities.Any()) return;
             
             var activities = new List<Activity>

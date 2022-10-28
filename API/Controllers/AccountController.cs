@@ -51,12 +51,15 @@ namespace API.Controllers
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto ){
             if (await _userManager.Users.AnyAsync(x=> x.Email == registerDto.Email))
             {
-                return BadRequest("Email Taken");
+                //This is for get the expected structure of the error and not return only a text string
+                ModelState.AddModelError("email","Email Taken");
+                return ValidationProblem(ModelState);
             }//end if (await _userManager.Users.AnyAsync(x=> x.Email == registerDto.Email))
 
             if (await _userManager.Users.AnyAsync(x=> x.UserName == registerDto.Username))
             {
-                return BadRequest("User Taken");
+                ModelState.AddModelError("UserName","UserName Taken");
+                return ValidationProblem(ModelState);
             }//end if (await _userManager.Users.AnyAsync(x=> x.UserName == registerDto.Username))
 
             var user= new AppUser{
