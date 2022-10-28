@@ -20,12 +20,20 @@ using AutoMapper;
 using API.Extensions;
 using FluentValidation.AspNetCore;
 using API.Middleware;
+using Microsoft.AspNetCore.Identity;
+using Domain;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers().AddFluentValidation(Config=>
+//Adding Authorization to the application
+builder.Services.AddControllers(opt=>{
+    var policy= new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(policy));
+})
+    .AddFluentValidation(Config=>
 {
     Config.RegisterValidatorsFromAssemblyContaining<Create>();
 
@@ -34,6 +42,8 @@ builder.Services.AddControllers().AddFluentValidation(Config=>
 //This call is for use the AddApplicationServices class
 //to set up the services we want to use
 builder.Services.AddApplicationServices(builder.Configuration);
+//Adding services related to identity autentication section 12
+builder.Services.AddIdentityServices(builder.Configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 // builder.Services.AddEndpointsApiExplorer();
@@ -58,6 +68,8 @@ app.UseCors("CorsPolicy");
 //app.UseCors(options =>options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
 //app.UseCors(options =>options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+//Order is important first need to be UseAuthentication then UseAuthorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>{
@@ -69,8 +81,10 @@ var services = scope.ServiceProvider;
 try{
     
     var context = services.GetRequiredService<DataContext>();
+    var userManager= services.GetRequiredService<UserManager<AppUser>>();
+    
     await context.Database.MigrateAsync();
-    await Seed.SeedData(context);
+    await Seed.SeedData(context,userManager);
 }//end try
 catch(Exception ex){
     var logger =services.GetRequiredService<ILogger<Program>>();
