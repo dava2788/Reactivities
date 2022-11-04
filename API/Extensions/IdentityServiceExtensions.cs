@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using System.Text;
+using Infrastructure.Security;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Extensions
 {
@@ -37,6 +39,18 @@ namespace API.Extensions
                     ValidateAudience=false
                 };
             });
+
+            services.AddAuthorization(options => {
+                options.AddPolicy("IsActivityHost",policy=>{
+                    //We add as a policy requirement the infrastructure class
+                    //IsHostRequirement
+                    policy.Requirements.Add(new IsHostRequirement());
+                });
+            });
+
+            //With this line we can use attributes in our end points to add this policy
+            services.AddTransient<IAuthorizationHandler,IsHostRequirementHandler>();
+
             //inject the Token service to the Program
             services.AddScoped<TokenService>();
             return services;

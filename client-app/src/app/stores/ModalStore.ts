@@ -19,14 +19,11 @@ export default class ModalStore {
     openModal=(content:JSX.Element) =>{
         this.modal.open=true;
         this.modal.body=content;
-
     }//end openModal
 
     closeModal=() =>{
         this.modal.open=false;
         this.modal.body=null;
-
     }//end closeModal
     
-
 }//end class ModalStore {

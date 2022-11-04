@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
-    // [AllowAnonymous]
+
     public class ActivitiesController : BaseApiController
     {
         #region Code for using the CancellationToken EXAMPLE
@@ -35,6 +35,10 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new Create.Command{Activity=activity}));
         }//end CreateActivity
 
+        //This attribute is to use the policy we create in the infrastructure
+        //IsHostRequirement and add as well in our IdentityServicesExtensions
+        //With this we make sure only the host will be able to EDIT the activity
+        [Authorize(Policy ="IsActivityHost")]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditActivity(Guid id, Activity activity)
         {
@@ -42,10 +46,20 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new Edit.Command{Activity=activity}));
         }//end EditActivity
 
+        //This attribute is to use the policy we create in the infrastructure
+        //IsHostRequirement and add as well in our IdentityServicesExtensions
+        //With this we make sure only the host will be able to DELETE the activity
+        [Authorize(Policy ="IsActivityHost")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id)
         {
             return HandleResult(await Mediator.Send(new Delete.Command{Id=id}));
+        }//end DeleteActivity
+
+        [HttpPost("{id}/attend")]
+        public async Task<IActionResult> Attend(Guid id)
+        {
+            return HandleResult(await Mediator.Send(new UpdateAttendace.Command{Id=id}));
         }//end DeleteActivity
 
     }//end ActivitiesController

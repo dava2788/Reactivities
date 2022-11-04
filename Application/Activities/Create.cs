@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Core;
+using Application.Interfaces;
 using Domain;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Activities
@@ -32,13 +34,30 @@ namespace Application.Activities
         public class Handler : IRequestHandler<Command,Result<Unit>>
         {
             private readonly DataContext _context;
-            public Handler(DataContext context)
+        private readonly IUserAccessor _userAccessor;
+            public Handler(DataContext context,IUserAccessor userAccessor)
             {
+                _userAccessor = userAccessor;
                 _context = context;
             }//end Handler Constructor
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
+                //Get the user object of the context with the name we got in the _userAccessor
+                var user = await _context.Users.FirstOrDefaultAsync(x=> x.UserName==_userAccessor.GetUserName());
+
+                //Create the Attendee
+                var Attendee= new ActivityAttendee{
+                    AppUser=user,
+                    Activity=request.Activity,
+                    IsHost=true
+                };
+
+                //Adding the Attendess to the activity
+                request.Activity.Attendees.Add(Attendee);
+
+                //Then we are going to create the activity as normal
+                
                 //This method not required to be async
                 //Because we are not modifying the DB
                 //This modify context only the memory

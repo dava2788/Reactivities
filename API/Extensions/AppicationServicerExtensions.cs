@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Activities;
 using Application.Core;
+using Application.Interfaces;
+using Infrastructure.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -35,8 +37,10 @@ namespace API.Extensions
             services.AddMediatR(typeof(List.Handler).Assembly);
 
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            //With this service we have the ability to get the currently log in User, Username anywehre in our application
+            services.AddScoped<IUserAccessor,UserAccessor>();
 
             return services;
-        }//end AddApplicationServices
+        }//end AddApplicationServices 
     }//end class AppicationServicerExtensions
 }
