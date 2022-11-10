@@ -24,7 +24,7 @@ export default observer( function LoginForm() {
             }
         >
             {({handleSubmit,isSubmitting,errors})=>(
-                <Form className='ui form' onSubmit={handleSubmit} autoComplete='off'>
+                <Form className='ui form' onSubmit={handleSubmit} autoComplete='on'>
                     <Header as='h2' content='LogIn To Reactivities' color='teal' textAlign='center'></Header>
                     <MyTextInput name='email' placeholder='email'/>
                     <MyTextInput name='password' placeholder='password' type='password'/>
@@ -33,7 +33,6 @@ export default observer( function LoginForm() {
                         render={()=> <Label style={{marginBotton:10}} basic color='red' content={errors.error}/>}
                     />
                     <Button loading={isSubmitting} positive content='login' type='submit' fluid/>
-
                 </Form>
             )}
 

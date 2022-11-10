@@ -12,28 +12,20 @@ import MyTextArea from '../../../app/common/form/MyTextArea';
 import MySelectInput from '../../../app/common/form/MySelectInput';
 import { categoryOptions } from '../../../app/common/options/categoryOptions';
 import MyDateInput from '../../../app/common/form/MyDateInput';
-import { Activity } from '../../../app/models/activity';
+import { ActivityFormValues } from '../../../app/models/activity';
 import { v4 as uuid } from 'uuid';
 
 export default observer(function ActivityForm(){
     const navigate=useNavigate();
     const {activityStore}= useStore();
-    const{createActivity,updateActivity,loading,loadActitivy,loadingInitial}=activityStore;
+    const{createActivity,updateActivity,loadActitivy,loadingInitial}=activityStore;
     const{id} =useParams<{id: string}>();
 
-    const [activity, SetActivity]=useState<Activity>({
-        id: '',
-        title: '',
-        date: null,
-        description: '',
-        category: '',
-        city: '',
-        venue: '',
-    });
+    const [activity, SetActivity]=useState<ActivityFormValues>(new ActivityFormValues());
    
     useEffect(()=>{
         if (id) {
-            loadActitivy(id).then(activity=>SetActivity(activity!));
+            loadActitivy(id).then(activity=>SetActivity(new ActivityFormValues(activity!)));
         }//end  if (id)
     },[id,loadActitivy]);//end useEffect
 
@@ -46,8 +38,8 @@ export default observer(function ActivityForm(){
         city:Yup.string().required(),
     });
 
-    function handleFromSubmit(activity:Activity){
-        if(activity.id.length===0){
+    function handleFromSubmit(activity:ActivityFormValues){
+        if(!activity.id){
             let newActivity={
                 ...activity,
                 id:uuid()
@@ -83,7 +75,7 @@ export default observer(function ActivityForm(){
                             <Header content='Location Detial' sub color='teal'></Header>
                             <MyTextInput placeholder='City' name='city' />
                             <MyTextInput placeholder='Venue' name='venue' />
-                            <Button disabled={isSubmitting || !dirty || !isValid} floated="right" positive type="submit" content="Submit" loading={loading}/>
+                            <Button disabled={isSubmitting || !dirty || !isValid} floated="right" positive type="submit" content="Submit" loading={isSubmitting}/>
                             <Button floated="right" type="button" content="Cancel" as={Link} to={`/activities`}/>
                         </Form>
                     )}
