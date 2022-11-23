@@ -14,8 +14,13 @@ namespace Persistence
         {
 
         }//end constructor
+        //DbSet For Activities
         public DbSet<Activity> Activities { get; set; }
+        //DbSet For ActivityAttendees 
         public DbSet<ActivityAttendee>ActivityAttendees{ get; set; }
+        //DbSet For Photos , the table name will get the name for
+        //here
+        public DbSet<Photo>Photos{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

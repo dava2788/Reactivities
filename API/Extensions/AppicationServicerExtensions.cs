@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,10 +36,20 @@ namespace API.Extensions
 
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
-
+            //Adding AutoMappert
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+            //Adding services from Infrastructure project
             //With this service we have the ability to get the currently log in User, Username anywehre in our application
             services.AddScoped<IUserAccessor,UserAccessor>();
+            //For implement the PhotoAccessor class
+            services.AddScoped<IPhotoAccessor,PhotoAccessor>();
+            //Add Cloudinary for Photo management, get from the appSettings.json the Cloudinary setting 
+            //Using the CloudinarySettings for initialize
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+
+
+
 
             return services;
         }//end AddApplicationServices 

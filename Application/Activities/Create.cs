@@ -14,7 +14,9 @@ namespace Application.Activities
 {
     public class Create
     {
-        //This is a Command type class. Query return Data. But command doesn't
+        //This is a Command type class. 
+        //Query return Data. 
+        //But command doesn't
         //because it doesn't return anything 
         public class Command:IRequest<Result<Unit>>{
             //This is what we are going to recieved as a parameter
@@ -31,6 +33,12 @@ namespace Application.Activities
                 RuleFor(x=>x.Activity).SetValidator(new ActivityValidator());
             }//end Constructor CommadValidator
         }//end CommadValidator
+
+        //For the Meadiator IRequestHandler Interface
+        //We need to provide what is the request Type
+        //And What is the response type.
+        //This example is a Command type
+        //Response is Result<Unit>
         public class Handler : IRequestHandler<Command,Result<Unit>>
         {
             private readonly DataContext _context;
