@@ -14,6 +14,7 @@ import LoginForm from '../../features/users/LoginForm';
 import { useStore } from '../stores/store';
 import LoadingComponent from './LoadingComponents';
 import ModalContainer from '../common/modals/ModalContainer';
+import ProfilePage from '../../features/profiles/ProfilePage';
 
 
 
@@ -48,6 +49,7 @@ function App() {
                 <Route key={location.key} path={path} element={<ActivityForm key={location.key} />} />
               );
             })}
+            <Route path='/profiles/:username' element={<ProfilePage/>}/> 
             <Route path='/errors' element={<TestErrors/>}/> 
             <Route path='*' element={<NotFound />} />
             <Route path='/Server-Error' element={<ServerError />} />

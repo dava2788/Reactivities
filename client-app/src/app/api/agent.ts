@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { AppHistory } from "../..";
 
 import { Activity, ActivityFormValues } from "../models/activity";
+import { Photo, Profile } from "../models/profile";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
 
@@ -89,9 +90,31 @@ const Account={
     register:(user:UserFormValues)=>requests.post<User>('/account/register',user)
 }
 
+const Profiles={
+    get:(username:string)=>requests.get<Profile>(`/profiles/${username}`),
+    //this method is more complex we will need to upload the image
+    //we will use axio directly
+    uploadPhoto:(file:Blob)=>{
+        let formData= new FormData();
+        //This need to match the name of the property
+        formData.append('File',file);
+        return axios.post<Photo>('photos', formData, {
+            //we need to be very carefull with the spelling
+            //Take a look very carefull to the upper case
+            headers: {'Content-Type': 'multipart/form-data'}
+        });
+    },//upload Photo
+    SetMainPhoto:(id:string)=>requests.post(`/photos/${id}/setMain`,{}),
+    deletePhoto:(id:string)=>requests.del(`/photos/${id}`),
+
+
+
+}//end Profiles
+
 const agent={
     Activities,
-    Account
+    Account,
+    Profiles
 }
 
 export default agent;

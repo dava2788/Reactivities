@@ -58,4 +58,10 @@ export default class UserStore{
     }//end register
 
 
+    setImage=(image:string)=>{
+        if (this.user) {
+            this.user.image=image;
+        }//end if (this.user)
+    }//end setImage
+
 }//end class UserStore
