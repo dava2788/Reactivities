@@ -21,6 +21,8 @@ namespace Persistence
         //DbSet For Photos , the table name will get the name for
         //here
         public DbSet<Photo>Photos{ get; set; }
+        //DBSet for Comments
+         public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,7 +40,10 @@ namespace Persistence
             .WithMany(a=>a.Attendees)
             .HasForeignKey(aa=> aa.ActivivityId);
 
-
+            builder.Entity<Comment>()
+            .HasOne(a=>a.Activity)
+            .WithMany(c=>c.Comments)
+            .OnDelete(DeleteBehavior.Cascade);
 
         }//end OnModelCreating
 

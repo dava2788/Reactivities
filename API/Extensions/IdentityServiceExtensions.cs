@@ -38,6 +38,26 @@ namespace API.Extensions
                     ValidateIssuer=false,
                     ValidateAudience=false
                 };
+                //This is for authenticate in signalR
+                //This is because for signalR 
+                //Doesn't have ability to sedn a http authorization header to use for send the JWT
+                //So, we will use the query string to send the jwt
+                opt.Events= new JwtBearerEvents
+                {
+                    OnMessageReceived= context =>
+                    {   
+                        var accessToken=context.Request.Query["access_token"];
+                        var path= context.HttpContext.Request.Path;
+                        //With this we will verify the name of the root we config in program.cs. THe end point 
+                        //we configure in program.cs
+                        if(!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+                        {
+                            //Add the JWT to the context
+                            context.Token=accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             services.AddAuthorization(options => {

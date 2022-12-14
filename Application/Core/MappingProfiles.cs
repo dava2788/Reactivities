@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Activities;
+using Application.Comments;
 using AutoMapper;
 using Domain;
 
@@ -30,9 +31,14 @@ namespace Application.Core
             //We need to create a mapping for get the Photos
             CreateMap<AppUser,Profiles.Profile>()
                 .ForMember(d=>d.Image, options=>options.MapFrom(source=>source.Photos.FirstOrDefault(x=>x.IsMain).Url));
+
+            //New map for map our new Comments Feature
+            //From The comment to the ComentDto
+            CreateMap<Comment, CommentDto>()
+                .ForMember(d => d.DisplayName, options => options.MapFrom(source => source.Author.DisplayName))
+                .ForMember(d => d.UserName, options => options.MapFrom(source => source.Author.UserName))
+                .ForMember(d=>d.Image, options=>options.MapFrom(source=>source.Author.Photos.FirstOrDefault(x=>x.IsMain).Url));
             
-
-
         }//end constructor MappingProfiles
     }//end class MappingProfile
 }//end namespace

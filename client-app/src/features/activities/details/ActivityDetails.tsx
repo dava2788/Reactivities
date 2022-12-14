@@ -12,7 +12,7 @@ import ActivityDetailedSideBar from "./ActivityDetailedSideBar";
 
 export default observer (function ActivityDetails(){
     const {activityStore}= useStore();
-    const{selectedActivity :activity,loadActitivy,loadingInitial}=activityStore;
+    const{selectedActivity :activity,loadActitivy,loadingInitial,clearSelectedActivity}=activityStore;
     //this is for get the Id pass by the URL
     const {id}=useParams<{id:string}>();
 
@@ -20,7 +20,11 @@ export default observer (function ActivityDetails(){
         if (id) {
             loadActitivy(id);
         }//if (id) 
-    },[id,loadActitivy]);
+        //the idea is clear the clearSelectedActivity of memory
+        //For do not affect the SignalR 
+        //section 19 video 219
+        return ()=>clearSelectedActivity();
+    },[id,loadActitivy,clearSelectedActivity]);
 
     if(loadingInitial|| !activity){
         return <LoadingComponent content='loading App'></LoadingComponent>;
@@ -31,7 +35,7 @@ export default observer (function ActivityDetails(){
                 <Grid.Column width={10}>
                     <ActivityDetailedHeader activity={activity}/>
                     <ActivityDetailedInfo activity={activity}/>
-                    <ActivityDetailedChat/>
+                    <ActivityDetailedChat activityId={activity.id}/>
                 </Grid.Column>
                 <Grid.Column width={6}>
                     <ActivityDetailedSideBar activity={activity} />

@@ -92,6 +92,23 @@ export default class ProfileStore{
             runInAction(()=>this.Loading=false);
             console.log(error)
         }//end catch
-
     }//end deletePhoto
+
+    updateProfile = async (profile: Partial<Profile>) => {
+        this.Loading = true;
+        try {
+            await agent.Profiles.updateProfile(profile);
+            runInAction(() => {
+                if (profile.displayName && profile.displayName !==
+                store.userStore.user?.displayName) {
+                store.userStore.SetDisplayName(profile.displayName);
+                }
+                this.profile = {...this.profile, ...profile as Profile};
+                this.Loading = false;
+            });
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.Loading = false);
+        }//end catch
+    }//end updateProfile
 }//end class ProfileStore

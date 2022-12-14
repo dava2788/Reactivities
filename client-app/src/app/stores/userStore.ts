@@ -64,4 +64,9 @@ export default class UserStore{
         }//end if (this.user)
     }//end setImage
 
+    SetDisplayName=(name:string)=>{
+        if (this.user) this.user.displayName = name;
+
+    }//end SetDisplayName
+
 }//end class UserStore

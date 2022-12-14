@@ -30,7 +30,9 @@ namespace API.Extensions
 
             services.AddCors(opt=>{
                 opt.AddPolicy("CorsPolicy",policy=>{
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+                    
+                    //The policy "AllowCredentials" is allow the signalR authorization
+                    policy.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:3000");
                     //policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
                 });
 
@@ -47,8 +49,8 @@ namespace API.Extensions
             //Add Cloudinary for Photo management, get from the appSettings.json the Cloudinary setting 
             //Using the CloudinarySettings for initialize
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
-
-
+            //Adding SIgnalR  as a service
+            services.AddSignalR();
 
 
             return services;

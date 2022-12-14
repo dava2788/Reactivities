@@ -15,6 +15,11 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new Details.Query{UserName=username}));
        }//end Task<IActionResult>GetProfile(string username)
 
+        [HttpPut]
+        public async Task<IActionResult> Edit(Edit.Command command)
+        {
+            return HandleResult(await Mediator.Send(command));
+        }
         
     }//end class ProfilesController:BaseApiController
 }//end namespace API.Controllers
