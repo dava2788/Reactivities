@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Persistence;
 using AutoMapper.QueryableExtensions;
+using Application.Interfaces;
 
 namespace Application.Activities
 {
@@ -18,7 +19,7 @@ namespace Application.Activities
         public class Query:IRequest<Result<List<ActivityDto>>>{}//end class Query
         public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
         {
-        public DataContext _context { get; }
+        
 
         #region Code for using the CancellationToken EXAMPLE
         // public ILogger<List> _logger { get; }
@@ -29,10 +30,14 @@ namespace Application.Activities
         //     }//end constructor Handler
 
         #endregion
-        public IMapper _Mapper { get; }
+        
+        private readonly IUserAccessor _userAccesor;
+        private readonly DataContext _context;
+        private readonly IMapper _Mapper;
 
-             public Handler(DataContext context,IMapper mapper)
+             public Handler(DataContext context,IMapper mapper,IUserAccessor userAccesor)
             {
+                _userAccesor = userAccesor;
                 _Mapper = mapper;
                 _context = context;
             }//end constructor Handler
@@ -71,7 +76,7 @@ namespace Application.Activities
                 //With this we wil get a cleaner select SQL query with only the 
                 //data we ned
                 var Activities= await _context.Activities
-                            .ProjectTo<ActivityDto>(_Mapper.ConfigurationProvider)
+                            .ProjectTo<ActivityDto>(_Mapper.ConfigurationProvider,new {currentUsername=_userAccesor.GetUserName()})
                             .ToListAsync();
 
                 
