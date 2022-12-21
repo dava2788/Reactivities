@@ -1,8 +1,8 @@
 import { format } from "date-fns";
-import {makeAutoObservable, runInAction} from "mobx"
-import { string } from "yup";
+import {makeAutoObservable, reaction, runInAction} from "mobx"
 import agent from "../api/agent";
 import { Activity, ActivityFormValues } from "../models/activity"
+import { Pagination, PagingParams } from "../models/pagination";
 import { Profile } from "../models/profile";
 import { store } from "./store";
 
@@ -12,10 +12,13 @@ export default class ActivityStore{
     editMode=false;
     loading=false;
     loadingInitial=false;
+    pagination:Pagination | null = null ;
+    pagingParams=new PagingParams();
+    predicate= new Map().set('all',true);
+
 
     constructor(){
         makeAutoObservable(this)
-
         //with using the autoObservavle
         //You will need to especify 
         //which properties will be
@@ -25,7 +28,69 @@ export default class ActivityStore{
         //     setTitle:action
         // })//end makeObservable
 
+        reaction(
+            ()=>this.predicate.keys(),
+            ()=>{
+                this.pagingParams = new PagingParams();
+                this.activityRegister.clear();
+                this.loadActitivies();
+            }
+        )//end reaction
+
     }//end constructor
+
+    setPaginsParams= (pagingParams:PagingParams)=>{
+        this.pagingParams=pagingParams;
+
+    }//end setPaginsParams
+
+    setPredicate=(predicate:string , value : string | Date)=>{
+        const resetPredicate=()=>{
+            this.predicate.forEach((value, key)=>{
+                if(key !== 'starDate') this.predicate.delete(key);
+            });
+        }//end resetPredicate
+        switch(predicate){
+            case 'all':
+                resetPredicate();
+                this.predicate.set('all',true);
+            break;
+            case 'isGoing':
+                resetPredicate();
+                this.predicate.set('isGoing',true);
+            break;
+            case 'isHost':
+                resetPredicate();
+                this.predicate.set('isHost',true);
+            break;
+            case 'startDate':
+                this.predicate.delete('startDate');
+                this.predicate.set('startDate', value);
+            break;
+
+        }//end swtich
+
+    }//end setPredicate
+
+    //This method will add to the query string
+    //the 2 params and values
+    get axiosParams(){
+        const params= new URLSearchParams();
+        params.append('pageNumber',this.pagingParams.pageNumber.toString());
+        params.append('pageSize',this.pagingParams.pageSize.toString());
+        this.predicate.forEach((value, key)=>{
+            if(key === 'startDate'){
+                params.append(key, (value as Date).toISOString());
+            }//end  if(key === 'startDate')
+            else{
+                params.append(key, value);
+             }//end ELSE if(key === 'startDate')
+        });
+
+
+        return params;
+
+    }//end axiosParams
 
     get activitiesByDate(){
         return Array.from(this.activityRegister.values()).sort((a,b)=>
@@ -53,12 +118,13 @@ export default class ActivityStore{
             //This line with the await will
             //wait until we have something in the activities []
             //before continue with the next line
-            const activities= await agent.Activities.list();
+            const results= await agent.Activities.list(this.axiosParams);
              
-            activities.forEach(activity=>{
+            results.data.forEach(activity=>{
                 this.setActivity(activity);
-                }
-            );//end Forach
+            });//end Forach
+            //set the pagination results
+            this.setPagination(results.pagination)
 
             this.setLoadingInitial(false);
             
@@ -68,6 +134,11 @@ export default class ActivityStore{
             this.setLoadingInitial(false);
         }//end catch
     }//end loadAcitivies
+
+    setPagination = (pagination:Pagination)=>{
+        this.pagination= pagination;
+
+    }//end setPagination
 
     loadActitivy=async(id:string)=>{
         let activity=this.getActivity(id);
@@ -220,7 +291,7 @@ export default class ActivityStore{
     updateAttendeeFollowing = (username:string)=>{
         this.activityRegister.forEach(activity=>{
             activity.attendees.forEach(attendee=>{
-                if (attendee.username==username) {
+                if (attendee.username===username) {
                     attendee.following ? attendee.followersCount-- : attendee.followersCount++;
                     attendee.following = !attendee.following;
                 }//end if (atendee.username==username)

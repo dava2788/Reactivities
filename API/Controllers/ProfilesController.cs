@@ -19,7 +19,13 @@ namespace API.Controllers
         public async Task<IActionResult> Edit(Edit.Command command)
         {
             return HandleResult(await Mediator.Send(command));
-        }
+        }//end Task<IActionResult> Edit(Edit.Command command)
+
+        [HttpGet("{username}/activities")]
+        public async Task<IActionResult> GetUserActivities(string username, string Predicate)
+        {
+            return HandleResult(await Mediator.Send(new ListActivities.Query{UserName=username ,Predicate=Predicate}));
+        }//end Task<IActionResult> GetUserActivities(string username, string Predicate)
         
     }//end class ProfilesController:BaseApiController
 }//end namespace API.Controllers

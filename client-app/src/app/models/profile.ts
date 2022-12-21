@@ -25,4 +25,12 @@ export interface Photo{
     url:string;
     isMain:boolean;
 
-}
+}//end Photo interface
+
+export interface UserActivity{
+    id:string;
+    title:string;
+    category:string;
+    date:Date;
+
+}//end UserActivity interface

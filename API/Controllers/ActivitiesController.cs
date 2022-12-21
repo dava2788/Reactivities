@@ -2,6 +2,7 @@ using Domain;
 using Microsoft.AspNetCore.Mvc;
 using Application.Activities;
 using Microsoft.AspNetCore.Authorization;
+using Application.Core;
 
 namespace API.Controllers
 {
@@ -17,9 +18,11 @@ namespace API.Controllers
         #endregion
 
         [HttpGet]
-        public async Task<IActionResult> GetActivities()
+        //The PagingParams we will get it form our query string
+        //So, we will need give the APi Controller a hit where to look this params
+        public async Task<IActionResult> GetActivities([FromQuery]ActivityParams param)
         {
-            return HandleResult( await Mediator.Send(new List.Query()));
+            return HandlePageResult( await Mediator.Send(new List.Query{Params=param}));
         }//end GetActivities
 
         [HttpGet("{id}")]// Activities/ids

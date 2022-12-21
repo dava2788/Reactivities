@@ -16,8 +16,12 @@ namespace Application.Activities
 {
     public class List
     {
-        public class Query:IRequest<Result<List<ActivityDto>>>{}//end class Query
-        public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
+        public class Query:IRequest<Result<PagedList<ActivityDto>>>
+        {
+            public ActivityParams Params { get; set; }
+        }//end class Query
+
+        public class Handler : IRequestHandler<Query, Result<PagedList<ActivityDto>>>
         {
         
 
@@ -42,7 +46,7 @@ namespace Application.Activities
                 _context = context;
             }//end constructor Handler
 
-            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<PagedList<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 #region Code for using the CancellationToken EXAMPLE
                 //Code for using the CancellationToken
@@ -74,14 +78,25 @@ namespace Application.Activities
 
                 //this code is for using projection for load related entities
                 //With this we wil get a cleaner select SQL query with only the 
-                //data we ned
-                var Activities= await _context.Activities
+                //data we need
+                //Also AsQueryable is not async method because we are deffering the call to the DB
+                var query= _context.Activities
+                            .Where(d=>d.Date>request.Params.StartDate)
+                            .OrderBy(d=>d.Date)
                             .ProjectTo<ActivityDto>(_Mapper.ConfigurationProvider,new {currentUsername=_userAccesor.GetUserName()})
-                            .ToListAsync();
-
+                            .AsQueryable();
                 
+                if(request.Params.IsGoing && !request.Params.IsHost){
+                    query= query.Where(x=>x.Attendees.Any(a=>a.Username == _userAccesor.GetUserName()));
+                }//end if(request.Params.IsGoing && !request.Params.IsHost)
 
-                return  Result<List<ActivityDto>>.Success(Activities);
+                if(request.Params.IsHost && !request.Params.IsGoing){
+                    query= query.Where(x=>x.HostUsername==_userAccesor.GetUserName());
+                }//end if(request.Params.IsHost && !request.Params.IsGoing)
+
+                return  Result<PagedList<ActivityDto>>.Success(
+                            await PagedList<ActivityDto>.CreateAsynct(query, request.Params.PageNumber,request.Params.PageSize)
+                        );
 
 
             }//end Task

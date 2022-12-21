@@ -50,6 +50,16 @@ namespace Application.Core
                 .ForMember(destination => destination.DisplayName, options => options.MapFrom(source => source.Author.DisplayName))
                 .ForMember(destination => destination.UserName, options => options.MapFrom(source => source.Author.UserName))
                 .ForMember(destination=>destination.Image, options=>options.MapFrom(source=>source.Author.Photos.FirstOrDefault(x=>x.IsMain).Url));
+
+            CreateMap<ActivityAttendee, Profiles.UserActivityDto>()
+            .ForMember(destination=>destination.Id , options=>options.MapFrom(source=>source.Activity.Id))
+            .ForMember(destination=>destination.Date , options=>options.MapFrom(source=>source.Activity.Date))
+            .ForMember(destination=>destination.Title , options=>options.MapFrom(source=>source.Activity.Title))
+            .ForMember(destination=>destination.Category , options=>options.MapFrom(source=>source.Activity.Category))
+            .ForMember(
+                destination=>destination.HostUserName , 
+                options=>options.MapFrom(source=>source.Activity.Attendees.FirstOrDefault(x=>x.IsHost).AppUser.UserName)
+            );
             
         }//end constructor MappingProfiles
     }//end class MappingProfile
