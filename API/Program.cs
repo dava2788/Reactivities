@@ -26,10 +26,43 @@ var app = builder.Build();
 //This is for get our own exception (Error) middleware
 app.UseMiddleware<ExceptionMiddleware>();// Configure the HTTP request pipeline.
 
+//Adding security required Headers
+//this one is for prevents the mime sniffing of the content type
+app.UseXContentTypeOptions();
+//this one refers to the referrer policy that allows a site to control how much info the browser includes
+//when nabaigating away from our app
+app.UseReferrerPolicy(opt=>opt.NoReferrer());
+//this one will add a cross-site scripting protection header
+app.UseXXssProtection(opt=>opt.EnabledWithBlockMode());
+//This one is for prevents our app being used inside an iframe which protects against click jacking
+app.UseXfo(opt=>opt.Deny());
+//This one is the main defense against the cross-site scrippting attacks
+//allow us to white source approve content
+//This content will be allow 
+app.UseCsp(opt=>opt
+    .BlockAllMixedContent()
+    .StyleSources(s=>s.Self().CustomSources("https://fonts.googleapis.com","https://cdn.jsdelivr.net/"))
+    .FontSources(s=>s.Self().CustomSources("https://fonts.gstatic.com/","data:","https://cdn.jsdelivr.net/"))
+    .FormActions(s=>s.Self())
+    .FrameAncestors(s=>s.Self())
+    .ImageSources(s=>s.Self().CustomSources("blob:","https://res.cloudinary.com"))
+    .ScriptSources(s=>s.Self())
+);
+
 if (app.Environment.IsDevelopment())
 {  
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv6 v1"));
+}else{
+    //adding a header only for production
+    //the Strict-Transport-Security header
+    app.Use(async(context, next)=>
+    {
+        //One year will 31536000
+        context.Response.Headers.Add("Strict-Transport-Security","max-age=31536000");
+        await next.Invoke();
+
+    });
 }
 
 
