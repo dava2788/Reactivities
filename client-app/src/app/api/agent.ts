@@ -1,10 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
-import { AppHistory } from "../..";
 import { Activity, ActivityFormValues } from "../models/activity";
 import { PaginatedResult } from "../models/pagination";
 import { Photo, Profile, UserActivity } from "../models/profile";
 import { User, UserFormValues } from "../models/user";
+import { router } from "../routes/Routes";
 import { store } from "../stores/store";
 
 const sleep =(delay:number)=>{
@@ -13,16 +13,17 @@ const sleep =(delay:number)=>{
     });
 }
 
-axios.defaults.baseURL='http://localhost:5000/api';
+axios.defaults.baseURL=process.env.REACT_APP_API_URL;
 
 axios.interceptors.request.use(config=>{
     const token = store.commonStore.token;
-    if(token){config.headers!.Authorization=`Bearer ${token}`}
+    if(token && config.headers){config.headers.Authorization=`Bearer ${token}`}
     return config;
 })
 
 axios.interceptors.response.use(async response=>{
-    await sleep(1000);
+    if (process.env.NODE_ENV==='development') await sleep(1000);
+    
     const pagination = response.headers['pagination'];
     if (pagination) {
         response.data = new PaginatedResult(response.data, JSON.parse(pagination));
@@ -32,19 +33,18 @@ axios.interceptors.response.use(async response=>{
     return response;
 
 },(error:AxiosError)=>{
-    const {data, status, config}:{data:any,status:number,config:AxiosRequestConfig<any>} = error.response!;
+    const {data, status, config}:{data:any,status:number,config:AxiosRequestConfig<any>} = error.response as AxiosResponse;
     switch (status) {
         case 400:
             if (typeof data=='string') {
                 toast.error(data);
             }//END if (typeof data=='string')
 
-
             if (config.method==='get' && data.errors.hasOwnProperty('id')) {
-                AppHistory.push("/NotFound");
+                router.navigate("/NotFound");
             }//end if (config.method=='get' && data.errors.hasOwnProperty('id')) 
 
-            if (data?.errors) {
+            if (data.errors) {
                 const modalStateErrors=[];
                 for (const key in data.errors) {
                     if (data.errors[key]) {
@@ -59,11 +59,11 @@ axios.interceptors.response.use(async response=>{
             break;
         case 404:
             toast.error("Not Found");
-            AppHistory.push("/NotFound");
+            router.navigate("/NotFound");
             break;
         case 500:
             store.commonStore.setServerError(data);
-            AppHistory.push("/Server-Error");
+            router.navigate("/Server-Error");
             break;
         default:
             console.log(data);

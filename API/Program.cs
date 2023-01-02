@@ -1,30 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using Persistence;
-using MediatR;
 using Application.Activities;
-using Application.Core;
-using AutoMapper;
-using API.Extensions;
-using FluentValidation.AspNetCore;
-using API.Middleware;
-using Microsoft.AspNetCore.Identity;
-using Domain;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using API.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,11 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(opt=>{
     var policy= new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     opt.Filters.Add(new AuthorizeFilter(policy));
-})
-    .AddFluentValidation(Config=>
-{
-    Config.RegisterValidatorsFromAssemblyContaining<Create>();
-
 });
 
 //This call is for use the AddApplicationServices class
@@ -50,6 +19,8 @@ builder.Services.AddIdentityServices(builder.Configuration);
 // builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 
+//Adding MiddleWare
+//Configure the Http Request pipeline
 var app = builder.Build();
 
 //This is for get our own exception (Error) middleware
@@ -58,12 +29,9 @@ app.UseMiddleware<ExceptionMiddleware>();// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {  
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv6 v1"));
 }
 
-// app.UseHttpsRedirection();
-
-app.UseRouting();
 
 app.UseCors("CorsPolicy");
 //app.UseCors(options =>options.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
@@ -73,12 +41,20 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>{
-    endpoints.MapControllers();
-    });
+//this is for the content of wwroot
+//After we use the npm run build for create the
+//wwroot folder in the API
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
+
+
+app.MapControllers();
 //Map the ChatHub and the root will be chat
 app.MapHub<ChatHub>("/chat");
+//this is the wat to active the fullback controller 
+//for sync the wwwroot react app 
+app.MapFallbackToController("Index","Fullback");
 
 
 using var scope = app.Services.CreateScope();

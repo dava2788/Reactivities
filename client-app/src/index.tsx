@@ -1,16 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './app/layout/App';
 import './app/layout/styles.css';
 import reportWebVitals from './reportWebVitals';
 import { store, StoreContext } from './app/stores/store';
 import 'react-calendar/dist/Calendar.css'
 import 'react-toastify/dist/ReactToastify.min.css';
-import {unstable_HistoryRouter as HistoryRouter} from 'react-router-dom';
-import { createBrowserHistory } from 'history';
+import {RouterProvider} from 'react-router-dom';
 import 'react-datepicker/dist/react-datepicker.min.css';
+import { router } from './app/routes/Routes';
 
-export const AppHistory = createBrowserHistory();
+//export const AppHistory = createBrowserHistory();
 
 
 const root = ReactDOM.createRoot(
@@ -19,9 +18,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <StoreContext.Provider value={store}>
-    <HistoryRouter history={AppHistory}>
-      <App/>   
-    </HistoryRouter>
+      <RouterProvider router={router}/>
   </StoreContext.Provider> 
   
 );

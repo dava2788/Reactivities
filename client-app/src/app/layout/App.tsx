@@ -1,22 +1,15 @@
-import React, { useEffect } from 'react';
-import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
+import React from 'react';
+import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Route, Routes, useLocation } from 'react-router-dom';
-import ActivityForm from '../../features/activities/form/ActivityForm';
+import { Outlet, useLocation } from 'react-router-dom';
 import HomePage from '../../features/home/HomePage';
-import ActivityDetails from '../../features/activities/details/ActivityDetails';
-import Layout from './Layout';
-import TestErrors from '../../features/errors/TestErrors';
 import { ToastContainer } from 'react-toastify';
-import NotFound from '../../features/errors/NotFound';
-import ServerError from '../../features/errors/ServerError';
-import LoginForm from '../../features/users/LoginForm';
 import { useStore } from '../stores/store';
 import LoadingComponent from './LoadingComponents';
 import ModalContainer from '../common/modals/ModalContainer';
-import ProfilePage from '../../features/profiles/ProfilePage';
-
-
+import NavigBar from './NavigBar';
+import { Container } from 'semantic-ui-react';
+import ScrollToTop from './ScrollToTop';
 
 
 function App() {
@@ -39,23 +32,35 @@ function App() {
       <>
       <ToastContainer position='bottom-right' hideProgressBar/>
       <ModalContainer/>
-        <Routes>
-          <Route path='/' element={<HomePage/>} /> 
-          <Route  element={<Layout/>}>
-            <Route path='/activities'  element={<ActivityDashboard/>}/>
-            <Route path='/activities/:id' element={<ActivityDetails/>}/>
-            {["/createActivity", "/manage/:id"].map((path) => {
-              return (
-                <Route key={location.key} path={path} element={<ActivityForm key={location.key} />} />
-              );
-            })}
-            <Route path='/profiles/:username' element={<ProfilePage/>}/> 
-            <Route path='/errors' element={<TestErrors/>}/> 
-            <Route path='*' element={<NotFound />} />
-            <Route path='/Server-Error' element={<ServerError />} />
-            <Route path='/login' element={<LoginForm />} />
-          </Route> 
-        </Routes>
+      {location.pathname === '/' ? <HomePage/> 
+      : (
+        <>
+          <ScrollToTop/>
+          <NavigBar/>
+          <Container style={{marginTop:'7em'}}>
+              <Outlet/>
+          </Container>
+        </>
+
+      )}
+      
+      {/* <Routes>
+        <Route path='/' element={<HomePage/>} /> 
+        <Route  element={<Layout/>}>
+          <Route path='/activities'  element={<ActivityDashboard/>}/>
+          <Route path='/activities/:id' element={<ActivityDetails/>}/>
+          {["/createActivity", "/manage/:id"].map((path) => {
+            return (
+              <Route key={location.key} path={path} element={<ActivityForm key={location.key} />} />
+            );
+          })}
+          <Route path='/profiles/:username' element={<ProfilePage/>}/> 
+          <Route path='/errors' element={<TestErrors/>}/> 
+          <Route path='*' element={<NotFound />} />
+          <Route path='/Server-Error' element={<ServerError />} />
+          <Route path='/login' element={<LoginForm />} />
+        </Route> 
+      </Routes> */}
       </>
     );
   }//end else

@@ -29,8 +29,8 @@ export default observer(function HomePage(){
                     </>
                 )}
             </Container>
-
         </Segment>
+        
     );
 }//end  function HomePage
 )

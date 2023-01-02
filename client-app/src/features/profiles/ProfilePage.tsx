@@ -13,7 +13,7 @@ export default observer(function ProfilePage() {
     const{loadingProfile,loadProfile,profile,setActiveTab}=profileStore;
 
     useEffect(()=>{
-        loadProfile(username!);
+        if (username)loadProfile(username);
         return ()=>{
             //this is for clean up the Followings
             setActiveTab(0);
