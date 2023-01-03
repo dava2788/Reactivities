@@ -7,6 +7,7 @@ import { store } from "./store";
 export default class UserStore{
     user:User | null = null;
     fbLoading=false;
+    refreshTokenTimeout:any;
 
     constructor(){
         makeAutoObservable(this)
@@ -20,6 +21,7 @@ export default class UserStore{
         try {
             const user = await agent.Account.login(creds);
             store.commonStore.setToken(user.token);
+            this.startRefreshTokenTimer(user);
             runInAction(()=>this.user=user);
             router.navigate('/activities');
             store.modalStore.closeModal();
@@ -39,7 +41,9 @@ export default class UserStore{
     getUser=async ()=>{
         try {
             const user= await agent.Account.current();
+            store.commonStore.setToken(user.token);
             runInAction(()=> this.user=user);
+            this.startRefreshTokenTimer(user);
         } catch (error) {
             console.log(error);
         }//end catch
@@ -49,6 +53,7 @@ export default class UserStore{
         try {
             const user = await agent.Account.register(creds);
             store.commonStore.setToken(user.token);
+            this.startRefreshTokenTimer(user);
             runInAction(()=>this.user=user);
             router.navigate('/activities');
             store.modalStore.closeModal();
@@ -75,6 +80,7 @@ export default class UserStore{
             this.fbLoading=true;
             const user = await agent.Account.fbLogin(accessToken);
             store.commonStore.setToken(user.token);
+            this.startRefreshTokenTimer(user);
             runInAction(()=>{
                 this.user= user;
                 this.fbLoading=false;
@@ -88,5 +94,36 @@ export default class UserStore{
         }
 
     }//end facebookLogin
+
+    refreshToken= async ()=>{
+        this.stopRefreshTokenTimer();
+        try {
+            const user= await agent.Account.refrehsToken();
+            runInAction(()=>this.user=user);
+            store.commonStore.setToken(user.token);
+            this.startRefreshTokenTimer(user);
+        } catch (error) {
+            console.log(error);
+        }//end catch
+
+    }//end refreshToken
+
+    private startRefreshTokenTimer(user:User)
+    {
+        //THis is for decode the token the atob function
+        const jwToken = JSON.parse(atob(user.token.split('.')[1]));
+        const expires = new Date(jwToken.exp *1000);
+        //set the timeout to 30 seconds before expired
+        const timeout= expires.getTime()-Date.now()- (30 *1000);
+        //with this property the idea is refresh the token every 30 prior the expires of the token
+        //In the background the user is going to be unaware of this unless they take a look in the network tab 
+        this.refreshTokenTimeout=setTimeout(this.refreshToken,timeout);
+    }//end startRefreshTokenTimer
+
+    private stopRefreshTokenTimer()
+    {
+        clearTimeout(this.refreshTokenTimeout);
+
+    }//end stopRefreshTokenTimer
 
 }//end class UserStore

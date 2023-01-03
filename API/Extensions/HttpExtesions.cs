@@ -19,8 +19,13 @@ namespace API.Extensions
             };
 
             response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationHeader));
+            
+            #region Old way to expose the header
+            //Because now we are exposing the Pagination Header form the applicationServiceExtension
+            //this code below is not necessary
             //This is to expose the new header
-            response.Headers.Add("Access-Control-Expose-Headers","Pagination");
+            // response.Headers.Add("Access-Control-Expose-Headers","Pagination");
+            #endregion
 
              
         }//end AddPaginationHeader

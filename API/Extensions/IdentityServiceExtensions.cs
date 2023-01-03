@@ -36,7 +36,11 @@ namespace API.Extensions
                     ValidateIssuerSigningKey=true,
                     IssuerSigningKey=key,
                     ValidateIssuer=false,
-                    ValidateAudience=false
+                    ValidateAudience=false,
+                    ValidateLifetime=true,
+                    //This validator parameter is for avoid the  default lifetime 5 minutes window the system has configure.
+                    //With option the default windows will be removed
+                    ClockSkew= TimeSpan.Zero
                 };
                 //This is for authenticate in signalR
                 //This is because for signalR 
