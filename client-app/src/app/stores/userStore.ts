@@ -113,8 +113,8 @@ export default class UserStore{
         //THis is for decode the token the atob function
         const jwToken = JSON.parse(atob(user.token.split('.')[1]));
         const expires = new Date(jwToken.exp *1000);
-        //set the timeout to 30 seconds before expired
-        const timeout= expires.getTime()-Date.now()- (30 *1000);
+        //set the timeout to 60 seconds before expired
+        const timeout= expires.getTime()-Date.now()- (60 *1000);
         //with this property the idea is refresh the token every 30 prior the expires of the token
         //In the background the user is going to be unaware of this unless they take a look in the network tab 
         this.refreshTokenTimeout=setTimeout(this.refreshToken,timeout);
