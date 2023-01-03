@@ -33,6 +33,7 @@ namespace Persistence
                         DisplayName = "Tom",
                         UserName = "tom",
                         Email = "tom@test.com"
+                        
                     },
                 };
 

@@ -70,7 +70,7 @@ namespace API.Extensions
                 opt.AddPolicy("CorsPolicy",policy=>{
                     
                     //The policy "AllowCredentials" is allow the signalR authorization
-                    policy.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:3000");
+                    policy.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:3000","https://localhost:3000");
                     //policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
                 });
 
