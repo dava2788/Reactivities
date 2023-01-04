@@ -19,9 +19,12 @@ namespace API.Extensions
         public static IServiceCollection AddIdentityServices(this IServiceCollection services,IConfiguration config){
             services.AddIdentityCore<AppUser>(opt=>{
                 opt.Password.RequireNonAlphanumeric=false;
+                //This is for add Email Verificacion
+                opt.SignIn.RequireConfirmedEmail=true;
             })
             .AddEntityFrameworkStores<DataContext>()
-            .AddSignInManager<SignInManager<AppUser>>();
+            .AddSignInManager<SignInManager<AppUser>>()
+            .AddDefaultTokenProviders();
             
             //Now we sign the Token
             //For this we need a Key

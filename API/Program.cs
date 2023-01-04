@@ -41,12 +41,12 @@ app.UseXfo(opt=>opt.Deny());
 //This content will be allow 
 app.UseCsp(opt=>opt
     .BlockAllMixedContent()
-    .StyleSources(s=>s.Self().CustomSources("https://fonts.googleapis.com","https://cdn.jsdelivr.net/","sha256-DpOoqibK/BsYhobWHnU38Pyzt5SjDZuR/mFsAiVN7kk="))
+    .StyleSources(s=>s.Self().CustomSources("https://fonts.googleapis.com","https://cdn.jsdelivr.net/","sha256-VdJLYZrBOhBJj2L4/+iZupDWpR1sppzSbgJzXdO/Oss="))
     .FontSources(s=>s.Self().CustomSources("https://fonts.gstatic.com/","data:","https://cdn.jsdelivr.net/"))
     .FormActions(s=>s.Self())
     .FrameAncestors(s=>s.Self())
     .ImageSources(s=>s.Self().CustomSources("blob:","https://res.cloudinary.com","data:","https://platform-lookaside.fbsbx.com"))
-    .ScriptSources(s=>s.Self().CustomSources("https://connect.facebook.net"))
+    .ScriptSources(s=>s.Self().CustomSources("https://connect.facebook.net","sha256-Eu090r7l9qVD4riidnmxERoM4BTE4ZJLUIw2LaK/zSk=","sha256-Tui7QoFlnLXkJCSl1/JvEZdIXTmBttnWNxzJpXomQjg="))
 );
 
 if (app.Environment.IsDevelopment())

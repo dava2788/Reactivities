@@ -1,6 +1,7 @@
 using Application.Activities;
 using Application.Interfaces;
 using FluentValidation;
+using Infrastructure.Email;
 using Infrastructure.Photos;
 using Infrastructure.Security;
 
@@ -97,6 +98,8 @@ namespace API.Extensions
             //Adding the AddFluentValidationAutoValidation
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<Create>();
+            //adding the SendGrid Service
+            services.AddScoped<EmailSender>();
 
 
             return services;

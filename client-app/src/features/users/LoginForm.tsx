@@ -18,7 +18,7 @@ export default observer( function LoginForm() {
                 (values,{setErrors})=>(
                     userStore.login(values)
                     .catch(error=>setErrors(
-                        {error:'Invalid Email or Password'}
+                        {error:error.response.data}
                     ))
                 )
             }

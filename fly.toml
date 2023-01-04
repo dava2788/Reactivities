@@ -13,6 +13,7 @@ processes = []
   Cloudinary__CloudName="dnptqvrtg"
   Cloudinary__ApiKey="278984731469749"
   Facebook__AppId="487741590100531"
+  SendGrid__User="Dava2788-Admin"
 
 [experimental]
   allowed_public_ports = []
